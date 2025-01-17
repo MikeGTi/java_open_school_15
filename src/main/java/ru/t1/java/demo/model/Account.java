@@ -44,6 +44,16 @@ public class Account {
     @OneToMany(mappedBy = "account", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Transaction> transactions = new HashSet<>();
 
+    public Account(UUID accountUuid, Client client, AccountType accountType, AccountStatus status, BigDecimal balance, BigDecimal frozenAmount) {
+        this.accountUuid = accountUuid;
+        this.client = client;
+        this.accountType = accountType;
+        this.status = status;
+        this.balance = balance;
+        this.frozenAmount = frozenAmount;
+        //this.transactions = transactionSet;
+    }
+
     public void addTransaction(Transaction transaction) {
         transactions.add(transaction);
         transaction.setAccount(this);

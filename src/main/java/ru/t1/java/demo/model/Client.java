@@ -32,6 +32,13 @@ public class Client {
     @OneToMany(mappedBy = "client", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Account> accounts;
 
+    public Client(UUID clientUuid, String firstName, String lastName, String middleName) {
+        this.clientUuid = clientUuid;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.middleName = middleName;
+    }
+
     public void addAccount(Account account) {
         accounts.add(account);
         account.setClient(this);
