@@ -1,10 +1,10 @@
 package ru.t1.java.demo.model;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.*;
-import org.springframework.data.jpa.domain.AbstractPersistable;
+
+import java.util.List;
+import java.util.UUID;
 
 @Getter
 @Setter
@@ -13,7 +13,12 @@ import org.springframework.data.jpa.domain.AbstractPersistable;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "client")
-public class Client extends AbstractPersistable<Long> {
+public class Client {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "client_uuid")
+    private UUID clientUuid;
 
     @Column(name = "first_name")
     private String firstName;
@@ -23,5 +28,18 @@ public class Client extends AbstractPersistable<Long> {
 
     @Column(name = "middle_name")
     private String middleName;
+
+    @OneToMany(mappedBy = "client", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Account> accounts;
+
+    public void addAccount(Account account) {
+        accounts.add(account);
+        account.setClient(this);
+    }
+
+    public void removeAccount(Account account) {
+        accounts.remove(account);
+        account.setClient(null);
+    }
 
 }

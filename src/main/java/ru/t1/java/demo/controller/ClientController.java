@@ -2,36 +2,71 @@ package ru.t1.java.demo.controller;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RestController;
-import ru.t1.java.demo.aop.HandlingResult;
-import ru.t1.java.demo.aop.Track;
-import ru.t1.java.demo.aop.LogException;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+import ru.t1.java.demo.dto.ClientDto;
 import ru.t1.java.demo.exception.ClientException;
+import ru.t1.java.demo.model.Client;
 import ru.t1.java.demo.service.ClientService;
+import ru.t1.java.demo.util.ClientMapper;
 
-import java.io.IOException;
+import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequiredArgsConstructor
 @Slf4j
+@RequestMapping("/client")
 public class ClientController {
 
     private final ClientService clientService;
 
-    @LogException
-    @Track
-    @GetMapping(value = "/client")
-    @HandlingResult
-    public void doSomething() throws IOException, InterruptedException {
-//        try {
-//            clientService.parseJson();
-        Thread.sleep(3000L);
-        throw new ClientException();
-//        } catch (Exception e) {
-//            log.info("Catching exception from ClientController");
-//            throw new ClientException();
-//        }
+    @PostMapping
+    public ResponseEntity<ClientDto> createClient(@RequestBody ClientDto client) {
+        Client savedClient = clientService.create(ClientMapper.toEntity(client));
+        return new ResponseEntity<>(ClientMapper.toDto(savedClient),
+                                    HttpStatus.CREATED);
     }
 
+    @GetMapping
+    public ResponseEntity<List<ClientDto>> getAllClients() {
+        return new ResponseEntity<>(clientService.findAll().stream().map(ClientMapper::toDto).toList(),
+                                    HttpStatus.OK);
+    }
+
+    @GetMapping("/{clientUuid}")
+    public ResponseEntity<ClientDto> getClientByUuid(@PathVariable UUID clientUuid) {
+        try {
+            return new ResponseEntity<>(ClientMapper.toDto(clientService.findByClientUuid(clientUuid)),
+                                        HttpStatus.OK);
+        } catch (ClientException e) {
+            log.error(e.getMessage());
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+    }
+
+    @PutMapping("/{clientUuid}")
+    public ResponseEntity<ClientDto> updateClient(@PathVariable UUID clientUuid,
+                                                  @RequestBody ClientDto clientDto) {
+        try {
+            Client updatedClient = clientService.update(clientUuid, ClientMapper.toEntity(clientDto));
+            return new ResponseEntity<>(ClientMapper.toDto(updatedClient),
+                                        HttpStatus.OK);
+        } catch (ClientException e) {
+            log.error(e.getMessage());
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+    }
+
+    @DeleteMapping("/{clientUuid}")
+    public ResponseEntity<Void> deleteClient(@PathVariable UUID clientUuid) {
+        try {
+            clientService.delete(clientUuid);
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        } catch (ClientException e) {
+            log.error(e.getMessage());
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+    }
 }
