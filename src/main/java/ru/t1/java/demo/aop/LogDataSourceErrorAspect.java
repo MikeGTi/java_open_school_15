@@ -10,7 +10,8 @@ import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
-import ru.metric.service.ErrorLogService;
+import ru.t1.java.demo.service.ErrorLogService;
+//import ru.metric.service.ErrorLogService;
 
 
 @Slf4j
@@ -24,7 +25,7 @@ public class LogDataSourceErrorAspect {
     private final ErrorLogService errorLogService;
 
     @AfterThrowing(
-            pointcut = "@annotation(ru.metric.aop.LogDataSourceError)",
+            pointcut = "@annotation(ru.t1.java.demo.aop.LogDataSourceError)",
             throwing = "e")
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void logError(JoinPoint joinPoint, Exception e) {
