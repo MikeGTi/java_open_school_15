@@ -1,10 +1,9 @@
 package ru.t1.java.demo.model;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.*;
-import org.springframework.data.jpa.domain.AbstractPersistable;
+
+import java.util.UUID;
 
 @Getter
 @Setter
@@ -13,7 +12,13 @@ import org.springframework.data.jpa.domain.AbstractPersistable;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "client")
-public class Client extends AbstractPersistable<Long> {
+public class Client {
+
+    @Getter
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "client_uuid")
+    private UUID clientUuid;
 
     @Column(name = "first_name")
     private String firstName;
