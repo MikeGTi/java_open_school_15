@@ -5,7 +5,6 @@ import lombok.*;
 import ru.t1.java.demo.model.enums.AccountStatus;
 import ru.t1.java.demo.model.enums.AccountType;
 
-
 import java.math.BigDecimal;
 import java.util.HashSet;
 import java.util.Set;

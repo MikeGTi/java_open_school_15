@@ -1,6 +1,5 @@
 package ru.t1.java.demo.service;
 
-import org.springframework.transaction.annotation.Transactional;
 import ru.t1.java.demo.exception.AccountException;
 import ru.t1.java.demo.model.Account;
 
@@ -9,27 +8,15 @@ import java.util.UUID;
 
 public interface AccountService {
 
-    @Transactional(readOnly = true)
-    @LogDataSourceError
-    Account getAccountsByAccountUuid(UUID accountUuid);
+    Account create(Account account);
 
-    @Transactional(readOnly = true)
-    @LogDataSourceError
-    List<Account> getAccountsByClientUuid(UUID clientUuid);
-
-    @Transactional(readOnly = true)
-    @LogDataSourceError
-    List<Account> getAccountsByAccountUuid(List<UUID> accountUuids);
-
-    @Transactional(readOnly = true)
-    @LogDataSourceError
     List<Account> findAll();
 
-    @Transactional
-    @LogDataSourceError
-    Account save(Account account);
+    Account findByAccountUuid(UUID accountUuid) throws AccountException;
 
-    @Transactional
-    @LogDataSourceError
+    List<Account> findAccountsByAccountUuid(UUID accountUuid) throws AccountException;
+
+    Account update(UUID accountUuid, Account accountDto) throws AccountException;
+
     void delete(UUID accountUuid) throws AccountException;
 }

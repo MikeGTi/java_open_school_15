@@ -3,6 +3,7 @@ package ru.t1.java.demo.model;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.List;
 import java.util.UUID;
 
 @Getter
@@ -14,7 +15,6 @@ import java.util.UUID;
 @Table(name = "client")
 public class Client {
 
-    @Getter
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "client_uuid")
@@ -28,5 +28,18 @@ public class Client {
 
     @Column(name = "middle_name")
     private String middleName;
+
+    @OneToMany(mappedBy = "client", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Account> accounts;
+
+    public void addAccount(Account account) {
+        accounts.add(account);
+        account.setClient(this);
+    }
+
+    public void removeAccount(Account account) {
+        accounts.remove(account);
+        account.setClient(null);
+    }
 
 }

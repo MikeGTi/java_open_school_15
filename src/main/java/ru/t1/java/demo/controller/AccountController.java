@@ -43,14 +43,17 @@ public class AccountController {
 
     @GetMapping
     public ResponseEntity<List<AccountDto>> getAllAccounts() {
-        return new ResponseEntity<>(accountServiceImpl.findAll().stream().map(accountMapper::toDto).toList(),
+        return new ResponseEntity<>(accountServiceImpl.findAll()
+                                                        .stream()
+                                                        .map(accountMapper::toDto)
+                                                        .toList(),
                                     HttpStatus.OK);
     }
 
     @GetMapping("/{accountUuid}")
     public ResponseEntity<AccountDto> getAccountByUuid(@PathVariable UUID accountUuid) {
         try {
-            return new ResponseEntity<>(accountMapper.toDto(accountServiceImpl.findByUuid(accountUuid)), HttpStatus.OK);
+            return new ResponseEntity<>(accountMapper.toDto(accountServiceImpl.findByAccountUuid(accountUuid)), HttpStatus.OK);
         } catch (AccountException e) {
             log.error(e.getMessage());
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -58,7 +61,8 @@ public class AccountController {
     }
 
     @PutMapping("/{accountUuid}")
-    public ResponseEntity<AccountDto> updateAccount(@PathVariable UUID accountUuid, @RequestBody AccountDto accountDto) {
+    public ResponseEntity<AccountDto> updateAccount(@PathVariable UUID accountUuid,
+                                                    @RequestBody AccountDto accountDto) {
         Client client;
         try {
             client = clientServiceImpl.findByClientUuid(accountDto.getAccountUuid());
@@ -68,7 +72,7 @@ public class AccountController {
         }
 
         try {
-            Account account = accountServiceImpl.findByUuid(accountUuid);
+            Account account = accountServiceImpl.findByAccountUuid(accountUuid);
 
             account.setAccountType(accountDto.getAccountType());
             account.setBalance(accountDto.getBalance());
@@ -98,9 +102,10 @@ public class AccountController {
 
     @GetMapping("/client/{clientUuid}")
     public ResponseEntity<List<AccountDto>> getAllAccountsByClientId(@PathVariable UUID clientUuid) {
-        return new ResponseEntity<>(clientServiceImpl.findAccountsByClientUuid(clientUuid).stream()
-                                                                                          .map(accountMapper::toDto)
-                                                                                          .toList(),
+        return new ResponseEntity<>(clientServiceImpl.findAccountsByClientUuid(clientUuid)
+                                                        .stream()
+                                                        .map(accountMapper::toDto)
+                                                        .toList(),
                                     HttpStatus.OK);
     }
 }

@@ -56,7 +56,8 @@ public class TransactionController {
     }
 
     @PutMapping("/{transactionUuid}")
-    public ResponseEntity<TransactionDto> updateTransaction(@PathVariable UUID transactionUuid, @RequestBody TransactionDto transactionDto) {
+    public ResponseEntity<TransactionDto> updateTransaction(@PathVariable UUID transactionUuid,
+                                                            @RequestBody TransactionDto transactionDto) {
         try {
             Transaction updatedTransaction = transactionServiceImpl.update(transactionUuid, transactionDto);
             return new ResponseEntity<>(transactionMapper.toDto(updatedTransaction),
@@ -67,7 +68,7 @@ public class TransactionController {
         }
     }
 
-    @DeleteMapping("/{transactionId}")
+    @DeleteMapping("/{transactionUuid}")
     public ResponseEntity<Void> deleteTransaction(@PathVariable UUID transactionUuid) {
         try {
             transactionServiceImpl.delete(transactionUuid);
@@ -80,9 +81,10 @@ public class TransactionController {
 
     @GetMapping("/account/{accountUuid}")
     public ResponseEntity<List<TransactionDto>> getAllTransactionsByAccountUuid(@PathVariable UUID accountUuid) {
-        return new ResponseEntity<>(accountService.findAllTransactionsByAccountId(accountUuid).stream()
-                                                                                              .map(transactionMapper::toDto)
-                                                                                              .toList(),
+        return new ResponseEntity<>(accountService.findAllTransactionsByAccountId(accountUuid)
+                                                    .stream()
+                                                    .map(transactionMapper::toDto)
+                                                    .toList(),
                                     HttpStatus.OK);
     }
 }

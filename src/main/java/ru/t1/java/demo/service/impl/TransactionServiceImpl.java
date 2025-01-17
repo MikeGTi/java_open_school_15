@@ -49,9 +49,8 @@ public class TransactionServiceImpl implements TransactionService {
     @LogDataSourceError
     @Override
     public Transaction findByUuid(UUID transactionUuid) {
-        Transaction transaction = transactionRepository.findByTransactionUuid(transactionUuid)
+        return transactionRepository.findByTransactionUuid(transactionUuid)
                 .orElseThrow(() -> new TransactionException(String.format("Transaction with uuid %s is not exists", transactionUuid)));
-        return transaction;
     }
 
     @Override

@@ -10,10 +10,10 @@ import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-import ru.service1.model.Client;
-import ru.service1.repository.ClientRepository;
-import ru.service3.aop.LogDataSourceError;
-import ru.service3.aop.Track;
+import ru.t1.java.demo.model.Client;
+import ru.t1.java.demo.repository.ClientRepository;
+import ru.t1.java.demo.aop.LogDataSourceError;
+import ru.t1.java.demo.aop.Track;
 
 import java.io.IOException;
 import java.io.InputStream;

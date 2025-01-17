@@ -24,7 +24,7 @@ public class ClientController {
 
     @PostMapping
     public ResponseEntity<ClientDto> createClient(@RequestBody ClientDto client) {
-        Client savedClient = clientService.createClient(ClientMapper.toEntity(client));
+        Client savedClient = clientService.create(ClientMapper.toEntity(client));
         return new ResponseEntity<>(ClientMapper.toDto(savedClient),
                                     HttpStatus.CREATED);
     }
@@ -47,9 +47,10 @@ public class ClientController {
     }
 
     @PutMapping("/{clientUuid}")
-    public ResponseEntity<ClientDto> updateClient(@PathVariable UUID clientUuid, @RequestBody ClientDto clientDto) {
+    public ResponseEntity<ClientDto> updateClient(@PathVariable UUID clientUuid,
+                                                  @RequestBody ClientDto clientDto) {
         try {
-            Client updatedClient = clientService.updateClient(clientUuid, ClientMapper.toEntity(clientDto));
+            Client updatedClient = clientService.update(clientUuid, ClientMapper.toEntity(clientDto));
             return new ResponseEntity<>(ClientMapper.toDto(updatedClient),
                                         HttpStatus.OK);
         } catch (ClientException e) {
@@ -61,7 +62,7 @@ public class ClientController {
     @DeleteMapping("/{clientUuid}")
     public ResponseEntity<Void> deleteClient(@PathVariable UUID clientUuid) {
         try {
-            clientService.deleteClient(clientUuid);
+            clientService.delete(clientUuid);
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         } catch (ClientException e) {
             log.error(e.getMessage());

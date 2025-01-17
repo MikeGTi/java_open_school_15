@@ -10,9 +10,9 @@ import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-import ru.service1.exception.DataConflictException;
-import ru.service1.exception.DataNotFoundException;
-import ru.service1.exception.ValidationException;
+import ru.t1.java.demo.exception.DataConflictException;
+import ru.t1.java.demo.exception.DataNotFoundException;
+import ru.t1.java.demo.exception.ValidationException;
 
 import java.time.LocalDateTime;
 
