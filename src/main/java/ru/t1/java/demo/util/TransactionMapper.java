@@ -32,7 +32,6 @@ public class TransactionMapper {
         return Transaction.builder()
                 .transactionUuid(dto.getTransactionUuid())
                 .account(account)
-                .client(client)
                 .amount(dto.getAmount())
                 .status(dto.getStatus())
                 .created(dto.getCreated())

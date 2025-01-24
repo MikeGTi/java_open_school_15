@@ -4,7 +4,6 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.proxy.HibernateProxy;
 import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.jpa.domain.AbstractPersistable;
 import org.springframework.format.annotation.DateTimeFormat;
 import ru.t1.java.demo.model.enums.TransactionStatus;
 
@@ -20,18 +19,16 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "tbl_transaction")
-public class Transaction extends AbstractPersistable<Long> {
+public class Transaction {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "transaction_uuid")
     private UUID transactionUuid;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "account_uuid")
     private Account account;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "client_uuid")
-    private Client client;
 
     @Column(name = "amount", precision = 19, scale = 2)
     private BigDecimal amount;
@@ -43,14 +40,17 @@ public class Transaction extends AbstractPersistable<Long> {
     @Column(name = "created")
     @CreatedDate
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    private LocalDateTime created = LocalDateTime.now();
+    private LocalDateTime created;
 
     public UUID getAccountUuid() {
         return account.getAccountUuid();
     }
 
-    public UUID getClientUuid() {
-        return client.getClientUuid();
+    public Transaction(Account account, BigDecimal amount, TransactionStatus status, LocalDateTime created) {
+        this.account = account;
+        this.amount = amount;
+        this.status = status;
+        this.created = created;
     }
 
     @Override

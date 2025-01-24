@@ -17,15 +17,19 @@ import ru.t1.java.demo.model.Transaction;
 import ru.t1.java.demo.model.enums.AccountStatus;
 import ru.t1.java.demo.model.enums.AccountType;
 import ru.t1.java.demo.model.enums.TransactionStatus;
+import ru.t1.java.demo.repository.AccountRepository;
 import ru.t1.java.demo.repository.ClientRepository;
 import ru.t1.java.demo.aop.LogDataSourceError;
 import ru.t1.java.demo.aop.Track;
+import ru.t1.java.demo.repository.TransactionRepository;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 
 @Setter
@@ -36,39 +40,92 @@ import java.util.*;
 public class MockDataLoader {
 
     private final ClientRepository clientRepository;
+    private final AccountRepository accountRepository;
+    private final TransactionRepository transactionRepository;
 
     @Value("${t1.mock-data.add-objects-counter}")
-    private Integer counter;
+    private Integer clientsCounter;
 
-    @Value("${t1.mock-data.account-file-path}")
-    private String accountFilePath;
-
-    @Value("${t1.mock-data.client-file-path}")
-    private String clientFilePath;
-
-    @Value("${t1.mock-data.transaction-file-path}")
-    private String transactionFilePath;
-
-    @Value("${t1.mock-data.full-data-file-path}")
-    private String fullDataFilePath;
-
+    @Track
+    @LogDataSourceError
     @PostConstruct
     void init() {
+        int accountsCounter = 3;
+        int transactionsCounter = 3;
+
         if (clientRepository.count() == 0) {
-            /*try {*/
-                log.info("Loading data from {}", fullDataFilePath);
-                /*loadData(fullDataFilePath);
-                loadData(transactionFilePath);
-                loadData(accountFilePath);
-                loadData(clientFilePath);*/
+            log.info("Mock data creating, {} clients", clientsCounter);
+            List<Client> clients = getClients(clientsCounter);
+            List<Account> accounts = getAccounts(clients, accountsCounter);
+            List<Transaction> transactions = getTransactions(accounts, transactionsCounter);
 
-                List<Client> clients = getFakeClients(100);
-                clientRepository.saveAll(clients);
+            clientRepository.saveAllAndFlush(clients);
+            log.info("Mock data saved to DB, {} clients", clientsCounter);
 
-            /*} catch (IOException e) {
-                log.error("Load data error", e);
-            }*/
+            accountRepository.saveAllAndFlush(accounts);
+            log.info("Mock data saved to DB, {} accounts", clientsCounter * accountsCounter);
+
+            transactionRepository.saveAllAndFlush(transactions);
+            log.info("Mock data saved to DB, {} transactions", clientsCounter * accountsCounter * transactionsCounter);
         }
+    }
+
+    private List<Client> getClients(int clientsCount) {
+        return IntStream.range(0, clientsCount)
+                        .mapToObj(i -> clientRepository.save(getFakeClient(i)))
+                        .collect(Collectors.toCollection(() -> new ArrayList<>(clientsCount)));
+    }
+
+    private Client getFakeClient(int count) {
+        return new Client("FirstNameTest" + count,
+                "LastNameTest" + count,
+                "MiddleNameTest" + count);
+    }
+
+    private List<Account> getAccounts(List<Client> clients, int accountsCount) {
+        List<Account> accounts = new ArrayList<>(accountsCount);
+        for (Client client : clients) {
+            for (int t = 0; t < accountsCount; t++) {
+                accounts.add(accountRepository.save(getFakeAccount(client)));
+            }
+        }
+        return accounts;
+    }
+
+    private Account getFakeAccount(Client client) {
+        Random random = new Random();
+
+        AccountType accountType = AccountType.values()[random.nextInt(AccountType.values().length)];
+        AccountStatus accountStatus = AccountStatus.values()[random.nextInt(AccountStatus.values().length)];
+        int min =  1_000;
+        int max = 150_000;
+
+        return new Account(client,
+                accountType,
+                accountStatus,
+                BigDecimal.valueOf(random.nextInt(min, max + 1)),
+                new BigDecimal(0));
+    }
+
+    private List<Transaction> getTransactions(List<Account> accounts, int transactionsCount) {
+        List<Transaction> transactions = new ArrayList<>(transactionsCount);
+        for (Account account : accounts) {
+            for (int t = 0; t < transactionsCount; t++) {
+                transactions.add(transactionRepository.save(getFakeTransaction(account)));
+            }
+        }
+        return transactions;
+    }
+
+    private Transaction getFakeTransaction(Account account) {
+        Random random = new Random();
+        TransactionStatus transactionStatus = TransactionStatus.values()[random.nextInt(TransactionStatus.values().length)];
+        int min =  200;
+        int max = 10_000;
+        return new Transaction(account,
+                               BigDecimal.valueOf(random.nextInt(min, max + 1)),
+                               transactionStatus,
+                               LocalDateTime.now());
     }
 
     @Track
@@ -82,76 +139,11 @@ public class MockDataLoader {
 
         List<Client> clients = objectMapper.readValue(inputStream, new TypeReference<>() {});
         clients.forEach(client -> client.getAccounts()
-                                        .forEach(account -> {
-                                                               account.setClient(client);
-                                                               account.getTransactions()
-                                                                      .forEach(transaction -> transaction.setAccount(account));
-                                                           }));
+                .forEach(account -> {
+                    account.setClient(client);
+                    account.getTransactions()
+                            .forEach(transaction -> transaction.setAccount(account));
+                }));
         clientRepository.saveAll(clients);
-    }
-
-    private List<Client> getFakeClients(int count) {
-        int accountsCount = 3;
-        int transactionsCount = 3;
-
-        List<Client> clients = new ArrayList<>(count);
-        List<Account> accounts = new ArrayList<>(accountsCount);
-        List<Transaction> transactions = new ArrayList<>(transactionsCount);
-
-        for (int i = 1; i < count + 1; i++) {
-            transactions.clear();
-            accounts.clear();
-
-            Client client = getFakeClient(i);
-
-            for (int a = 1; a < accountsCount + 1; a++) {
-                Account account = getFakeAccount(client);
-                accounts.add(account);
-
-                for (int t = 1; t < transactionsCount + 1; t++) {
-                    transactions.add(getFakeTransaction(client, account));
-                }
-
-                account.setTransactions(new HashSet<>(transactions));
-            }
-
-            client.setAccounts(accounts);
-            clients.add(client);
-        }
-
-        return clients;
-    }
-
-    private Client getFakeClient(int count) {
-        return new Client(UUID.randomUUID(),
-                "FirstNameTest" + count,
-                "LastNameTest" + count,
-                "MiddleNameTest" + count);
-    }
-
-    private Account getFakeAccount(Client client) {
-        Random random = new Random();
-
-        AccountType accountType = AccountType.values()[random.nextInt(AccountType.values().length)];
-        AccountStatus accountStatus = AccountStatus.values()[random.nextInt(AccountStatus.values().length)];
-
-        return new Account(UUID.randomUUID(),
-                            client,
-                            accountType,
-                            accountStatus,
-                            BigDecimal.valueOf(random.nextDouble()),
-                            new BigDecimal(0));
-    }
-
-    private Transaction getFakeTransaction(Client client, Account account) {
-        Random random = new Random();
-        TransactionStatus transactionStatus = TransactionStatus.values()[random.nextInt(TransactionStatus.values().length)];
-
-        return new Transaction(UUID.randomUUID(),
-                                account,
-                                client,
-                                BigDecimal.valueOf(random.nextDouble()),
-                                transactionStatus,
-                                LocalDateTime.now());
     }
 }

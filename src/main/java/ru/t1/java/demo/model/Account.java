@@ -24,7 +24,7 @@ public class Account {
     @Column(name = "account_uuid")
     private UUID accountUuid;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "client_uuid")
     private Client client;
 
@@ -44,14 +44,12 @@ public class Account {
     @OneToMany(mappedBy = "account", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Transaction> transactions = new HashSet<>();
 
-    public Account(UUID accountUuid, Client client, AccountType accountType, AccountStatus status, BigDecimal balance, BigDecimal frozenAmount) {
-        this.accountUuid = accountUuid;
+    public Account(Client client, AccountType accountType, AccountStatus status, BigDecimal balance, BigDecimal frozenAmount) {
         this.client = client;
         this.accountType = accountType;
         this.status = status;
         this.balance = balance;
         this.frozenAmount = frozenAmount;
-        //this.transactions = transactionSet;
     }
 
     public void addTransaction(Transaction transaction) {

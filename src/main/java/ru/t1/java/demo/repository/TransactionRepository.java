@@ -6,7 +6,6 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 import ru.t1.java.demo.model.Account;
-import ru.t1.java.demo.model.Client;
 import ru.t1.java.demo.model.Transaction;
 import ru.t1.java.demo.model.enums.TransactionStatus;
 
@@ -21,8 +20,6 @@ public interface TransactionRepository extends JpaRepository<Transaction, UUID> 
     Optional<Transaction> findByTransactionUuid(UUID transactionUuid);
 
     List<Transaction> findAllTransactionsByAccount(Account account);
-
-    List<Transaction> findAllTransactionsByClient(Client client);
 
     List<Transaction> findAllTransactionsByCreatedBetween(LocalDateTime start, LocalDateTime end);
 
