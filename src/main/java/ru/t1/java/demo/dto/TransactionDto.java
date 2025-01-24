@@ -29,9 +29,6 @@ public class TransactionDto implements Serializable {
     @JsonProperty("account_uuid")
     private UUID accountUuid;
 
-    @JsonProperty("client_uuid")
-    private UUID clientUuid;
-
     @JsonProperty("amount")
     private BigDecimal amount;
 

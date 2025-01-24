@@ -33,7 +33,7 @@ public class DataSourceErrorLog extends AbstractPersistable<Long> {
     @Column(name = "created")
     @CreatedDate
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    private LocalDateTime created = LocalDateTime.now();
+    private LocalDateTime created;
 
     @Override
     public final boolean equals(Object o) {

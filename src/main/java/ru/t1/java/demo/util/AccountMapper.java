@@ -22,7 +22,7 @@ public class AccountMapper {
 
     public Account toEntity(AccountDto dto) throws AccountException {
         UUID clientUuid = dto.getClientUuid();
-        Client client = clientRepository.findById(clientUuid)
+        Client client = clientRepository.findByClientUuid(clientUuid)
                 .orElseThrow(() -> new AccountException(String.format("Client with uuid %s is not exists", clientUuid)));
 
         Account account = Account.builder()

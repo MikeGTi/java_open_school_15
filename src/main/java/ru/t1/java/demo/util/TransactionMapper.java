@@ -25,10 +25,6 @@ public class TransactionMapper {
         Account account = accountRepository.findByAccountUuid(accountUuid)
            .orElseThrow(() -> new TransactionException(String.format("Account with uuid %s is not exists", accountUuid)));
 
-        UUID clientUuid = dto.getClientUuid();
-        Client client = clientRepository.findByClientUuid(clientUuid)
-            .orElseThrow(() -> new TransactionException(String.format("Client with uuid %s is not exists", clientUuid)));
-
         return Transaction.builder()
                 .transactionUuid(dto.getTransactionUuid())
                 .account(account)
@@ -42,6 +38,7 @@ public class TransactionMapper {
         return TransactionDto.builder()
                 .transactionUuid(entity.getTransactionUuid())
                 .amount(entity.getAmount())
+                .status(entity.getStatus())
                 .created(entity.getCreated())
                 .accountUuid(entity.getAccount().getAccountUuid())
                 .build();
