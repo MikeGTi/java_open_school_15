@@ -1,0 +1,66 @@
+spring:
+  application:
+    name: t1-java-demo
+  datasource:
+    url: "jdbc:postgresql://localhost:5432/t1_openschool15_db"
+    username: "postgres"
+    password: "postgres"
+    driverClassName: org.postgresql.Driver
+  liquibase:
+    enabled: true
+    change-log: db/changelog/db.changelog-master.xml
+
+logging:
+  level:
+    ROOT: INFO
+    ru.t1.java.demo.controller.ru.t1.java.base.controller.ClientController: DEBUG
+
+t1:
+  scan-path: ru.t1.java.demo
+
+  mock-data:
+    add-objects-counter: 100
+
+  transaction:
+    threshold:
+      count: 5
+      time: 60
+
+  kafka:
+    enabled: ${TRACK_KAFKA_LOG_ENABLED:true}
+
+    bootstrap:
+      server: ${KAFKA_SERVER:localhost:9092}
+
+    topic:
+      transactions_result: t1_demo_transaction_result
+      transactions_accept: t1_demo_transaction_accept
+
+    consumer:
+      group-id: t1_demo
+      max-poll-records: 10
+      properties:
+        session.timeout.ms: 150000
+        max.partition.fetch.bytes: 300000
+        max.poll.records: 1
+        max.poll.interval.ms: 3000
+
+    producer:
+      enable: true
+
+      topic:
+        data-source-errors: t1_demo_metrics
+        methods-metric: t1_demo_metrics
+
+        header:
+          data-source-errors-header: DATA_SOURCE
+          methods-metric-header: METRICS
+
+track:
+  errors-to-track: JsonParseException, IOException
+  method-execution-time-threshold-ms: 500
+
+  db:
+    enabled: false
+  time-limit-exceed: 1000
+  log-level: DEBUG
