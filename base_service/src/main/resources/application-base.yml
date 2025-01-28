@@ -1,6 +1,6 @@
 spring:
   application:
-    name: t1-java-demo
+    name: t1-java-base
   datasource:
     url: "jdbc:postgresql://localhost:5432/t1_openschool15_db"
     username: "postgres"
@@ -13,10 +13,12 @@ spring:
 logging:
   level:
     ROOT: INFO
-    ru.t1.java.demo.controller.ru.t1.java.base.controller.ClientController: DEBUG
+    ru.t1.java.base.controller.ClientController: DEBUG
+    ru.t1.java.base.controller.AccountController: DEBUG
+    ru.t1.java.base.controller.TransactionController: DEBUG
 
 t1:
-  scan-path: ru.t1.java.demo
+  scan-path: ru.t1.java.base
 
   mock-data:
     add-objects-counter: 100
@@ -37,7 +39,7 @@ t1:
       transactions_accept: t1_demo_transaction_accept
 
     consumer:
-      group-id: t1_demo
+      group-id: t1_demo_base
       max-poll-records: 10
       properties:
         session.timeout.ms: 150000
@@ -64,3 +66,4 @@ track:
     enabled: false
   time-limit-exceed: 1000
   log-level: DEBUG
+

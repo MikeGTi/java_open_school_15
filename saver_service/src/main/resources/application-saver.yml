@@ -1,0 +1,70 @@
+spring:
+  application:
+    name: t1-java-saver
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/t1_openschool15_db
+    driverClassName: org.postgresql.Driver
+    username: "postgres"
+    password: "postgres"
+    hikari:
+      driver-class-name: org.postgresql.Driver
+
+  liquibase:
+    enabled: false
+    change-log: db/changelog/db.changelog-master.xml
+
+  kafka:
+    bootstrap-servers: localhost:9092
+
+    topic:
+      transactions_result: t1_demo_transaction_result
+      transactions_accept: t1_demo_transaction_accept
+
+      account-registration: t1_demo_accounts
+      transaction-registration: t1_demo_transactions
+      transaction-accept: t1_demo_transaction_accept
+      transaction-result: t1_demo_transaction_result
+
+    consumer:
+      group-id: t1_demo
+      auto-offset-reset: earliest
+      key-deserializer: "org.apache.kafka.common.serialization.StringDeserializer"
+      value-deserializer: "org.springframework.kafka.support.serializer.JsonDeserializer"
+      properties:
+        spring.json.trusted.packages: "*"
+        session.timeout.ms: 150000
+        max.partition.fetch.bytes: 300000
+        max.poll.records: 1
+        max.poll.interval.ms: 3000
+
+
+logging:
+  level:
+    ROOT: INFO
+    ru.t1.java.saver.kafka.KafkaAccountConsumer: DEBUG
+    ru.t1.java.saver.kafka.KafkaTransactionConsumer: DEBUG
+
+mock-data:
+  add-objects-counter: 100
+
+t1:
+  scan-path: ru.t1.java.saver
+
+  transaction:
+    threshold:
+      count: 5
+      time: 60
+
+
+server:
+  port: 8081
+
+track:
+  errors-to-track: JsonParseException, IOException
+  method-execution-time-limit-ms: 500
+
+  db:
+    enabled: true
+  time-limit-exceed: 1000
+  log-level: DEBUG
