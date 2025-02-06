@@ -1,9 +1,9 @@
-package ru.t1.java.base.model;
+package ru.t1.java.locker.model;
 
 import jakarta.persistence.*;
 import lombok.*;
-import ru.t1.java.base.model.enums.AccountStatus;
-import ru.t1.java.base.model.enums.AccountType;
+import ru.t1.java.locker.model.enums.AccountStatus;
+import ru.t1.java.locker.model.enums.AccountType;
 
 import java.math.BigDecimal;
 import java.util.HashSet;
@@ -42,16 +42,7 @@ public class Account {
     private BigDecimal frozenAmount;
 
     @OneToMany(mappedBy = "account", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<Transaction> transactions;
-
-    public Account(Client client, AccountType accountType, AccountStatus status, BigDecimal balance, BigDecimal frozenAmount) {
-        this.transactions = new HashSet<>();
-        this.client = client;
-        this.accountType = accountType;
-        this.status = status;
-        this.balance = balance;
-        this.frozenAmount = frozenAmount;
-    }
+    private Set<Transaction> transactions = new HashSet<>();
 
     public void addTransaction(Transaction transaction) {
         transactions.add(transaction);

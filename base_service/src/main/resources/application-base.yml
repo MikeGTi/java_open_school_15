@@ -9,6 +9,12 @@ spring:
   liquibase:
     enabled: true
     change-log: db/changelog/db.changelog-master.xml
+  hikari:
+    driver-class-name: org.postgresql.Driver
+    schema: "t1_openschool15_db"
+    data-source-properties:
+      reWriteBatchedInserts: true
+
 
 logging:
   level:
